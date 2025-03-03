@@ -1,0 +1,257 @@
+{#{% load staticfiles %}#}
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1 , user-scalable=no">
+    <title>图书查询</title>
+    <link href="{% static 'plugins/bootstrap.css' %}" rel="stylesheet">
+    <link href="{% static 'plugins/bootstrap-dashen.css' %}" rel="stylesheet">
+    <link href="{% static 'plugins/font-awesome.css' %}" rel="stylesheet">
+    <link href="{% static 'plugins/animate.css' %}" rel="stylesheet">
+    <link href="{% static 'css/head.css' %}" rel="stylesheet">
+    <link rel="icon" href="https://image.youis.top/00.png" sizes="32x32">
+    <link href="{% static 'plugins/bootstrap-datetimepicker.min.css' %}" rel="stylesheet" media="screen">
+</head>
+<body style="margin-top:70px;">
+<div class="container">
+    {% include 'header.html' %}
+
+    <div class="col-md-9 wow fadeInRight">
+        <div class="row">
+            {% for book in books_page %}
+                {% if forloop.counter|add:-1|divisibleby:4 %}
+                    <div class="col-md-3 bottom15" style="clear: left;">
+                {% else %}
+                    <div class="col-md-3 bottom15">
+                {% endif %}
+            <a href="#"><img class="img-responsive" src="{{ book.bookPhoto.url }}"/></a>
+            <div class="showFields">
+                <div class="field">
+                    图书条形码:{{ book.barcode }}
+                </div>
+                <div class="field">
+                    图书名称:{{ book.bookName }}
+                </div>
+                <div class="field">
+                    图书所在类别:{{ book.bookTypeObj.bookTypeName }}
+                </div>
+                <div class="field">
+                    图书价格:{{ book.price }}
+                </div>
+                <div class="field">
+                    库存:{{ book.count }}
+                </div>
+                <div class="field">
+                    出版日期:{{ book.publishDate }}
+                </div>
+                <div class="field">
+                    出版社:{{ book.publish }}
+                </div>
+                <div class="field">
+                    图书文件:
+                    {% if book.bookFile == 'file/NoFile.jpg' %}
+                        暂无文件
+                    {% else %}
+                        <a href='{{ book.bookFile.url }}' target='_blank'>{{ book.bookFile }}</a>
+                    {% endif %}
+                </div>
+                <a class="btn  btn-info top5" href="{% url 'Book:frontShow' book.barcode %}">详情</a>
+                <a class="btn  btn-info top5" href="{% url 'Book:update_book' book.barcode %}">修改</a>
+                <a class="btn  btn-info top5" onclick="bookDelete('{{ book.barcode }}');">删除</a>
+            </div>
+            </div>
+            {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+<div id="editModal" style="display:none;">
+    <form id="updateForm" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" id="editBarcode" name="barcode">
+
+        <div>
+            <label for="bookName">图书名称:</label>
+            <input type="text" id="bookName" name="book.bookName" required>
+        </div>
+
+        <div>
+            <label for="bookTypeObj">图书类别:</label>
+            <select id="bookTypeObj" name="book.bookTypeObj.bookTypeId" required>
+                <!-- 这里可以动态填充书籍类型 -->
+                {% for bookType in bookTypes %}
+                    <option value="{{ bookType.bookTypeId }}">{{ bookType.bookTypeName }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <label for="price">价格:</label>
+            <input type="number" id="price" name="book.price" step="0.01" required>
+        </div>
+
+        <div>
+            <label for="count">库存:</label>
+            <input type="number" id="count" name="book.count" required>
+        </div>
+
+        <div>
+            <label for="publishDate">出版日期:</label>
+            <input type="date" id="publishDate" name="book.publishDate" required>
+        </div>
+
+        <div>
+            <label for="publish">出版社:</label>
+            <input type="text" id="publish" name="book.publish" required>
+        </div>
+
+        <div>
+            <label for="bookDesc">图书简介:</label>
+            <textarea id="bookDesc" name="book.bookDesc"></textarea>
+        </div>
+
+        <div>
+            <label for="bookPhoto">图书图片:</label>
+            <input type="file" id="bookPhoto" name="book.bookPhoto">
+            <p>当前图片: <img id="currentBookPhoto" src="" style="max-width: 100px;" alt="当前图书图片"></p>
+        </div>
+
+        <div>
+            <label for="bookFile">图书文件:</label>
+            <input type="file" id="bookFile" name="book.bookFile">
+            <p>当前文件: <a id="currentBookFile" href="#" target="_blank">无文件</a></p>
+        </div>
+
+        <button type="submit">保存</button>
+    </form>
+</div>
+<script src="{% static 'plugins/jquery.min.js' %}"></script>
+<script src="{% static 'plugins/bootstrap.js' %}"></script>
+<script src="{% static 'plugins/wow.min.js' %}"></script>
+<script src="{% static 'plugins/bootstrap-datetimepicker.min.js' %}"></script>
+<script src="{% static 'plugins/locales/bootstrap-datetimepicker.zh-CN.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/jsdate.js' %}"></script>
+<script src="{% static 'tiny_mce/tiny_mce.js' %}"></script>
+<script>
+    function bookEdit(barcode) {
+        // 获取图书信息
+        $.ajax({
+            url: '/Book/update/' + barcode + '/',
+            type: 'GET',
+            success: function(data) {
+            // 填充表单字段
+            $('#editBarcode').val(data.barcode);
+            $('#bookName').val(data.bookName);
+            $('#price').val(data.price);
+            $('#count').val(data.count);
+            $('#publishDate').val(data.publishDate);
+            $('#publish').val(data.publish);
+            $('#bookDesc').val(data.bookDesc);
+            $('#currentBookPhoto').attr('src', data.bookPhoto);
+            $('#currentBookFile').attr('href', data.bookFile).text(data.bookFile.split('/').pop());
+
+            // 填充图书类别
+            $('#bookTypeObj').val(data.bookTypeObjPri);
+
+            // 显示编辑表单
+            $('#editModal').show();
+        },
+        error: function(xhr, status, error) {
+            console.error('获取图书数据失败:', error);
+        }
+    });
+
+        // 处理表单提交
+        $('#updateForm').off('submit').on('submit', function(event) {
+            event.preventDefault();
+            var formData = new FormData(this);
+            $.ajax({
+                url: '/Book/update/' + barcode + '/',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.success) {
+                        alert('保存成功');
+                        // 重新加载页面或更新表单
+                    } else {
+                        alert('保存失败: ' + response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('更新失败:', xhr.responseText);
+                    alert("更新失败" + xhr.responseText);
+                }
+            });
+        });
+    }
+
+    $(function () {
+        /*小屏幕导航点击关闭菜单*/
+        $('.navbar-collapse a').click(function () {
+            $('.navbar-collapse').collapse('hide');
+        });
+        new WOW().init();
+
+        /*出版日期组件*/
+        $('.book_publishDate_edit').datetimepicker({
+            language: 'zh-CN',  //语言
+            format: 'yyyy-mm-dd',
+            minView: 2,
+            weekStart: 1,
+            todayBtn: 1,
+            autoclose: 1,
+            minuteStep: 1,
+            todayHighlight: 1,
+            startView: 2,
+            forceParse: 0
+        });
+    })
+    function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+    const csrftoken = getCookie('csrftoken');
+    function bookDelete(barcodes) {
+    if (confirm('确定要删除这些书吗？')) {
+        $.ajax({
+            url: '/Book/deletes/',
+            type: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken // 确保 CSRF token 正确
+            },
+            data: {
+                barcodes: barcodes // 以逗号分隔的条形码字符串
+            },
+            success: function(response) {
+                if (response.success) {
+                    alert(response.message);
+                    // 刷新页面或更新界面
+                } else {
+                    alert('删除失败: ' + response.message);
+                }
+            },
+            error: function(xhr) {
+                console.error('删除失败:', xhr);
+            }
+        });
+    }
+}
+</script>
+</body>
+</html>

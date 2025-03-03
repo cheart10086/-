@@ -1,0 +1,80 @@
+{#{% load staticfiles %}#}
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1 , user-scalable=no">
+    <title>图书类型查询</title>
+    <link href="{% static 'plugins/bootstrap.css' %}" rel="stylesheet">
+    <link href="{% static 'plugins/bootstrap-dashen.css' %}" rel="stylesheet">
+    <link href="{% static 'plugins/font-awesome.css' %}" rel="stylesheet">
+    <link href="{% static 'plugins/animate.css' %}" rel="stylesheet">
+    <link rel="icon" href="https://image.youis.top/00.png" sizes="32x32">
+    <link href="{% static 'plugins/bootstrap-datetimepicker.min.css' %}" rel="stylesheet" media="screen">
+    <link href="{% static 'css/head.css' %}" rel="stylesheet">
+</head>
+<body style="margin-top:70px;">
+<div class="container">
+    {% include 'header.html' %}
+    <div class="row">
+        <div class="col-md-12 wow fadeInDown" data-wow-duration="0.5s">
+            <div>
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs" role="tablist">
+                    <li><a href="{% url 'Index:index' %}">首页</a></li>
+                    <li role="presentation" class="active"><a href="#bookTypeListPanel"
+                                                              aria-controls="bookTypeListPanel" role="tab"
+                                                              data-toggle="tab">图书类型列表</a></li>
+                    <li role="presentation"><a href="{% url 'BookType:frontAdd' %}">添加图书类型</a></li>
+                </ul>
+            </div>
+            <div class="row">
+                <div class="col-md-10">
+                    <form class="form-horizontal" name="bookAddForm" id="bookAddForm" enctype="multipart/form-data"
+                          method="post" class="mar_t15">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="book_barcode" class="col-md-2 text-right">图书类型ID:</label>
+                            <div class="col-md-8">
+                                <input type="text" name="bookType_Id" class="form-control" placeholder="图书类型ID">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="book_bookName" class="col-md-2 text-right">图书类型名称:</label>
+                            <div class="col-md-8">
+                                <input type="text" name="bookType_Name" class="form-control" placeholder="图书类型名称">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="book_bookName" class="col-md-2 text-right">可借天数:</label>
+                            <div class="col-md-8">
+                                <input type="text" name="bookType_Day" class="form-control" placeholder="可借天数">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <span class="col-md-2"></span>
+                            <input type="submit" value="添加" class="btn btn-info bottom5 top5">
+                            <input type="button" id="Exit"
+                                   onclick="javascrtpt:window.location.href='{% url  "BookType:frontList" %} '"
+                                   value="取消" class="btn btn-info bottom5 top5">
+                        </div>
+                        <style>#bookAddForm .form-group {
+                            margin: 5px;
+                        }  </style>
+                    </form>
+                </div>
+                <div class="col-md-2"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{% static 'plugins/jquery.min.js' %}"></script>
+<script src="{% static 'plugins/bootstrap.js' %}"></script>
+<script src="{% static 'plugins/wow.min.js' %}"></script>
+<script src="{% static 'plugins/bootstrap-datetimepicker.min.js' %}"></script>
+<script src="{% static 'plugins/locales/bootstrap-datetimepicker.zh-CN.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/jsdate.js' %}"></script>
+</body>
+</html>

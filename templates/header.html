@@ -1,0 +1,35 @@
+<!--导航开始-->
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+        <!--小屏幕导航按钮和logo-->
+        <div class="navbar-header">
+            <button class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <!-headBigText-->
+            <a href="{% url 'Index:index' %}" class="navbar-brand">图书查询网</a>
+        </div>
+        <!--导航-->
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-left">
+                <li><a href="{% url 'Index:index' %}" style="color:grey">首页</a></li>
+                <li><a href="{% url 'Book:frontAll' %}" style="color:grey">所有图书</a></li>
+                <li><a href="{% url 'BookType:frontList' %}" style="color:grey">图书类型</a></li>
+                <li><a href="{% url 'Book:frontList' %}" style="color:grey">图书查询</a></li>
+<!--                <li><a href="{% url 'Index:login' %}">登录</a></li>-->
+<!--                <li><a href="#">退出</a></li>-->
+            </ul>
+            <!--
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="">登录</a></li>
+                <li><a href="#">退出</a></li>
+            </ul>
+            -->
+        </div>
+        <!--导航-->
+    </div>
+</nav>
+<!--导航结束-->
+{% csrf_token %}
